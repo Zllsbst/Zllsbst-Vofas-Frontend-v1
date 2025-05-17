@@ -31,7 +31,7 @@ const Header = () => {
                 {/* Mobile Navigation */}
                 <div className="md:hidden">
                     <div className="flex justify-between items-center">
-                        <Link to="/" className="text-purple font-bold text-xl">Vofas-Lutfen</Link>
+                        <Link to="/" className="text-blue-700 font-bold text-xl">VoFAS</Link>
                         <button
                             onClick={toggleMenu}
                             className="border border-gray-20 p-2"
@@ -42,20 +42,20 @@ const Header = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             ) : (
-                                <span className="text-sm text-gray-40">Ana menüyü aç</span>
+                                <span className="text-sm text-gray-40"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 12h16"/><path d="M4 18h16"/><path d="M4 6h16"/></svg></span>
                             )}
                         </button>
                     </div>
 
                     {isMenuOpen && (
                         <nav className="mt-2">
-                            <Link to="/" className="block py-1 text-gray-50 hover:text-purple-40">Ana Sayfa</Link>
-                            <Link to="/hakkinda" className="block py-1 text-gray-50 hover:text-purple-40">Hakkımızda</Link>
-                            <Link to="/iletisim" className="block py-1 text-gray-50 hover:text-purple-40">İletişim</Link>
-                            <Link to="/dashboard" className="block py-1 text-gray-50 hover:text-purple-40">Panel</Link>
-                            <Link to="/legal" className="block py-1 text-gray-50 hover:text-purple-40">Yasal</Link>
-                            <Link to="/gizlilik" className="block py-1 text-gray-50 hover:text-purple-40">Gizlilik</Link>
-                            <Link to="/login" className="block py-1 text-purple hover:text-purple-50 font-medium">Giriş Yap</Link>
+                            <Link to="/" className="block py-1 text-black hover:text-gray-500">Ana Sayfa</Link>
+                            <Link to="/hakkinda" className="block py-1 text-black hover:text-gray-500">Hakkımızda</Link>
+                            <Link to="/iletisim" className="block py-1 text-black hover:text-gray-500">İletişim</Link>
+                            <Link to="/dashboard" className="block py-1 text-black hover:text-gray-500">Panel</Link>
+                            <Link to="/legal" className="block py-1 text-black hover:text-gray-500">Yasal</Link>
+                            <Link to="/gizlilik" className="block py-1 text-black hover:text-gray-500">Gizlilik</Link>
+                            <Link to="/login" className="block py-1 text-black hover:text-gray-500 font-bold">Giriş Yap</Link>
                         </nav>
                     )}
                 </div>

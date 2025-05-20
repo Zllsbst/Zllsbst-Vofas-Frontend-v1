@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -8,46 +8,73 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
+  const [loginError, setLoginError] = useState('');
+  const navigate = useNavigate();
 
   //Checks email format and password length requirements
   const validate = () => {
     const newErrors = {};
-
-    // Email validation
+    
+    //email validation  
     if (!email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Email is invalid';
     }
 
-    // Password validation
+    //password validation
     if (!password) {
       newErrors.password = 'Password is required';
     } else if (password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   //Handles form submission 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoginError('');
     
     if (validate()) {
       setIsLoading(true);
       
-      // Simulate API call
-      setTimeout(() => {
+      try {
+        // Real API call to your backend
+        const response = await fetch('http://localhost:8080/vofas/api/v1/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: email, // Using email as username - adjust if your API expects different format
+            password: password
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Giriş başarısız');
+        }
+
+        // Store the token in localStorage
+        localStorage.setItem('token', data.data.token);
+        
+        // Redirect to dashboard or home page
+        navigate('/dashboard');
+      } catch (err) {
+        setLoginError(err.message || 'Giriş sırasında bir hata oluştu');
+      } finally {
         setIsLoading(false);
       }
     }
   };
 
   return (
-    // Main container
+    //Main container
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-colors-primary-10 to-white p-4">
       <div className="w-full max-w-md">
         {/* Card */}
@@ -57,7 +84,7 @@ export default function LoginPage() {
             <h2 className="text-2xl font-bold text-center text-white">Tekrar Hoş Geldiniz</h2>
             <p className="text-white text-center font-thin mt-2">Hesabınıza giriş yapın</p>
           </div>
-
+          
           {/* Form */}
           <div className="p-6 space-y-6">
             {/* Login Error Message */}
@@ -90,7 +117,7 @@ export default function LoginPage() {
               </div>
               {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
             </div>
-
+            
             {/* Password Field */}
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -103,7 +130,7 @@ export default function LoginPage() {
                 {/* Password input */}
                 <input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={`block w-full pl-10 pr-10 py-2 border ${
@@ -117,21 +144,23 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="text-gray-400 hover:text-gray-500 focus:outline-none"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
                   </button>
                 </div>
               </div>
               {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
             </div>
-
+            
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
                   id="remember-me"
                   type="checkbox"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
                   className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -144,7 +173,7 @@ export default function LoginPage() {
                 </a>
               </div>
             </div>
-
+            
             {/* Login Button */}
             <div>
               <button
@@ -153,32 +182,16 @@ export default function LoginPage() {
                 className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-colors-primary-40 hover:bg-colors-primary-30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-colors-primary-40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {isLoading ? (
-                  // Loading state
+                    //Loading state 
                   <div className="flex items-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                    <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Yükleniyor...
                   </div>
                 ) : (
-                  // Submit button
+                    //Submit button 
                   <div className="flex items-center">
                     <LogIn size={18} className="mr-2" />
                     Giriş Yap

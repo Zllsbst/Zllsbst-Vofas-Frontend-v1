@@ -2,27 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
 
-// Helper to set cookie
-function setCookie(name, value, days) {
-  let expires = '';
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    expires = '; expires=' + date.toUTCString();
-  }
-  document.cookie = name + '=' + (value || '') + expires + '; path=/';
-}
-
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const navigate = useNavigate();
 
-  // Checks email format and password length requirements
+
+  //Checks email format and password length requirements
   const validate = () => {
     const newErrors = {};
 
@@ -44,97 +32,15 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Save JWT token to cookie
-  const saveJwtToken = (token, remember) => {
-    // If rememberMe, set cookie for 7 days, else session cookie
-    setCookie('jwtToken', token, remember ? 7 : undefined);
-  };
-
-  // Parse JWT token to get payload data
-  const parseJwt = (token) => {
-    try {
-      // Get the payload part of the JWT (second part)
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch (error) {
-      console.error('Error parsing JWT token:', error);
-      return null;
-    }
-  };
-
-  // Setup auth header for future API requests
-  const setupAuthHeader = (token) => {
-    // This function can be used in an axios instance or fetch wrapper
-    // Example for axios:
-    // axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-    // Store in sessionStorage for immediate use in other components
-    sessionStorage.setItem('authHeader', `Bearer ${token}`);
-  };
-
-  // Handles form submission
-  const handleSubmit = async (e) => {
+  //Handles form submission 
+  const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     if (validate()) {
       setIsLoading(true);
-
-      try {
-        // Make API call to backend for authentication
-        // Update endpoint to match your actual authentication endpoint
-        const response = await fetch('/vofas/api/v1/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || 'Login failed');
-        }
-
-        // JWT token should be in the response
-        if (!data.token) {
-          throw new Error('JWT token not received');
-        }
-
-        // Save JWT token
-        const token = data.token;
-        saveJwtToken(token, rememberMe);
-
-        // Setup authorization header for future requests
-        setupAuthHeader(token);
-
-        // Get user role from JWT token
-        const payload = parseJwt(token);
-        const userRole = (payload?.role || '').toUpperCase(); // Normalize role
-
-        // Direct to appropriate dashboard based on role
-        // Use React Router navigation
-        if (userRole === 'ADMIN') {
-          alert('Admin login successful! Redirecting to Admin Dashboard...');
-          navigate('/admin/dashboard');
-        } else if (userRole === 'COMPANY_REPRESENTATIVE') {
-          alert('Company representative login successful! Redirecting to Company Dashboard...');
-          navigate('/company/dashboard');
-        } else {
-          alert(`Login successful with email: ${email}`);
-          navigate('/user/dashboard');
-        }
-      } catch (error) {
-        // Handle login errors
-        setErrors({ general: error.message || 'Login failed. Please try again.' });
-      } finally {
+      
+      // Simulate API call
+      setTimeout(() => {
         setIsLoading(false);
       }
     }
@@ -154,6 +60,13 @@ export default function LoginPage() {
 
           {/* Form */}
           <div className="p-6 space-y-6">
+            {/* Login Error Message */}
+            {loginError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-600 text-sm">{loginError}</p>
+              </div>
+            )}
+            
             {/* Email Field */}
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
